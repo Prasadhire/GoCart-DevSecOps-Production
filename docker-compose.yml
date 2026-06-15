@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  gocart-db:
+    image: postgres:15-alpine
+    container_name: gocart-db
+    environment:
+      POSTGRES_USER: gocart
+      POSTGRES_PASSWORD: gocart_secure_pass
+      POSTGRES_DB: gocart
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - gocart-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gocart -d gocart"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  gocart-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gocart-web
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://gocart:gocart_secure_pass@gocart-db:5432/gocart?schema=public
+      - DIRECT_URL=postgresql://gocart:gocart_secure_pass@gocart-db:5432/gocart?schema=public
+      - NEXT_PUBLIC_CURRENCY_SYMBOL=$
+    depends_on:
+      gocart-db:
+        condition: service_healthy
+    networks:
+      - gocart-network
+    restart: always
+
+volumes:
+  postgres_data:
+
+networks:
+  gocart-network:
+    driver: bridge
