@@ -1,85 +1,70 @@
-<div align="center">
-  <h1><img src="https://gocart-gs.vercel.app/favicon.ico" width="20" height="20" alt="GoCart Favicon">
-   GoCart</h1>
-  <p>
-    An open-source multi-vendor e-commerce platform built with Next.js and Tailwind CSS.
-  </p>
-  <p>
-    <a href="https://github.com/GreatStackDev/goCart/blob/main/LICENSE.md"><img src="https://img.shields.io/github/license/GreatStackDev/goCart?style=for-the-badge" alt="License"></a>
-    <a href="https://github.com/GreatStackDev/goCart/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome"></a>
-    <a href="https://github.com/GreatStackDev/goCart/issues"><img src="https://img.shields.io/github/issues/GreatStackDev/goCart?style=for-the-badge" alt="GitHub issues"></a>
-  </p>
-</div>
+# GoCart - Multivendor E-Commerce Platform
+
+GoCart is a modern, open-source multi-vendor e-commerce platform built with **Next.js** and **Tailwind CSS**. It supports vendor storefront management, customer dashboards, and platform administration.
 
 ---
 
-## 📖 Table of Contents
+## 🛠️ Tech Stack
 
-- [✨ Features](#-features)
-- [🛠️ Tech Stack](#-tech-stack)
-- [🚀 Getting Started](#-getting-started)
-- [🤝 Contributing](#-contributing)
-- [📜 License](#-license)
-
----
-
-## Features
-
-- **Multi-Vendor Architecture:** Allows multiple vendors to register, manage their own products, and sell on a single platform.
-- **Customer-Facing Storefront:** A beautiful and responsive user interface for customers to browse and purchase products.
-- **Vendor Dashboards:** Dedicated dashboards for vendors to manage products, view sales analytics, and track orders.
-- **Admin Panel:** A comprehensive dashboard for platform administrators to oversee vendors, products, and commissions.
-
-## 🛠️ Tech Stack <a name="-tech-stack"></a>
-
-- **Framework:** Next.js
-- **Styling:** Tailwind CSS
-- **UI Components:** Lucide React for icons
+- **Frontend & Backend:** Next.js (App Router, Standalone Build)
+- **Database ORM:** Prisma
+- **Database:** PostgreSQL
 - **State Management:** Redux Toolkit
+- **Styling:** Tailwind CSS
+- **Containerization:** Docker & Docker Compose
 
-## 🚀 Getting Started <a name="-getting-started"></a>
+---
 
-First, install the dependencies. We recommend using `npm` for this project.
+## 🚀 Getting Started Locally
 
+Follow the steps below to set up and run the application locally on your host machine.
+
+### Prerequisites
+- Node.js (v18+)
+- npm
+
+### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-Then, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### 2. Configure Environment Variables
+Create a `.env` file at the root of the project:
+```env
+DATABASE_URL="postgresql://gocart:gocart_secure_pass@localhost:5432/gocart?schema=public"
+DIRECT_URL="postgresql://gocart:gocart_secure_pass@localhost:5432/gocart?schema=public"
+NEXT_PUBLIC_CURRENCY_SYMBOL="$"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/(public)/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Outfit](https://vercel.com/font), a new font family for Vercel.
-
----
-
-## 🤝 Contributing <a name="-contributing"></a>
-
-We welcome contributions! Please see our [CONTRIBUTING.md](./CONTRIBUTING.md) for more details on how to get started.
+### 3. Run Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 📜 License <a name="-license"></a>
+## 🐳 Docker Local Development
 
-This project is licensed under the MIT License. See the [LICENSE.md](./LICENSE.md) file for details.
+The project is fully containerized. You can run the Next.js app and the PostgreSQL database in isolated Docker containers with a custom network.
 
-## Learn More
+### 1. Build and Run Containers
+Ensure **Docker Desktop** is running, then execute:
+```bash
+docker compose up -d --build
+```
+This command builds the Next.js app from the production-optimized multi-stage `Dockerfile` and runs PostgreSQL on port `5432`.
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Sync Database Schema
+To generate database tables inside the Docker Postgres container, run the database migrations:
+```bash
+npx prisma@5.18.0 db push
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 3. Access the Application
+- Open [http://localhost:3000](http://localhost:3000) to browse the Next.js application.
+- To view the database tables visually, launch Prisma Studio:
+  ```bash
+  npx prisma@5.18.0 studio
+  ```
+  Open [http://localhost:5555](http://localhost:5555) to view records.
