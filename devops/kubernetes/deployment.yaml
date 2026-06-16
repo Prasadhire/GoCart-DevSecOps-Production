@@ -29,7 +29,7 @@ spec:
 
       containers:
         - name: gocart-web
-          image: prasadhire/gocart:v1.0.0 # This tag will be dynamically updated by ArgoCD Image Updater
+          image: prasadhire/gocart:latest # This tag will be dynamically updated by ArgoCD Image Updater
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
