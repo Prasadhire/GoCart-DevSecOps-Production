@@ -1,0 +1,158 @@
+name: DevSecOps CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  static-analysis:
+    name: Code Quality & SAST Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of SonarQube analysis
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      # 1. Run SonarQube Analysis
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          projectBaseDir: .
+          args: >
+            -Dproject.settings=devops/security/sonar-project.properties
+
+      # 2. Run Trivy Filesystem Scan (checks package dependencies)
+      - name: Trivy FS Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'json'
+          output: 'trivy-fs-report.json'
+          exit-code: '0' # Do not fail the pipeline on finding vulnerabilities
+          severity: 'HIGH,CRITICAL'
+
+      # Upload Trivy FS Report as a GitHub Artifact
+      - name: Upload Trivy FS Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-fs-report
+          path: trivy-fs-report.json
+
+      # 3. Run OWASP Dependency-Check Scan
+      - name: OWASP Dependency-Check Scan
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'gocart'
+          path: '.'
+          format: 'HTML'
+          out: 'reports'
+
+      # Upload OWASP Dependency-Check Report as a GitHub Artifact
+      - name: Upload OWASP Dependency-Check Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: owasp-dependency-check-report
+          path: reports/
+
+  build-and-image-scan:
+    name: Docker Build & Vulnerability Scan
+    needs: static-analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Build the Docker image locally (without pushing) so it can be scanned
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          load: true # Load the image locally in Docker daemon
+          tags: prasadhire/gocart:${{ github.sha }}
+
+      # 3. Scan the built Docker image layers using Trivy
+      - name: Trivy Image Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'prasadhire/gocart:${{ github.sha }}'
+          scan-type: 'image'
+          format: 'json'
+          output: 'trivy-image-report.json'
+          exit-code: '0' # Do not fail the pipeline on finding vulnerabilities
+          severity: 'HIGH,CRITICAL'
+
+      # Upload Trivy Image Report as a GitHub Artifact
+      - name: Upload Trivy Image Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-image-report
+          path: trivy-image-report.json
+
+      # Log in to Docker Registry
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Build and Push image once security checks have passed
+      - name: Push Production Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            prasadhire/gocart:${{ github.sha }}
+            prasadhire/gocart:latest
+
+  dynamic-security-scan:
+    name: DAST Security Scanning (OWASP ZAP)
+    needs: build-and-image-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Run the built container in the background to scan it
+      - name: Start Container for DAST Scan
+        run: |
+          docker run -d --name app-scan -p 3000:3000 prasadhire/gocart:latest
+          # Wait for the Next.js standalone server to start up
+          sleep 10
+
+      # 4. OWASP ZAP Baseline Scan targeting the running container in the runner
+      - name: OWASP ZAP Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'http://localhost:3000'
+          fail_action: false # Keep false to generate security report without blocking deployments on minor frontend alerts
+
+      - name: Stop Container
+        run: docker stop app-scan

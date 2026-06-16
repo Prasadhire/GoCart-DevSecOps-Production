@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-image-updater
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    chart: argocd-image-updater
+    repoURL: 'https://argoproj.github.io/argo-helm'
+    targetRevision: 0.9.1
+    helm:
+      values: |
+        config:
+          logLevel: info
+          updateInterval: "2m"
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

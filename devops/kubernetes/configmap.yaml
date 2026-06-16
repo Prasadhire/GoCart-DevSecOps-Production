@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gocart-config
+  namespace: gocart
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  NEXT_PUBLIC_CURRENCY_SYMBOL: "$"

@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gocart-web
+  namespace: gocart
+  labels:
+    app: gocart-web
+    tier: web
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0%
+  selector:
+    matchLabels:
+      app: gocart-web
+  template:
+    metadata:
+      labels:
+        app: gocart-web
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+
+      containers:
+        - name: gocart-web
+          image: prasadhire/gocart:v1.0.0 # This tag will be dynamically updated by ArgoCD Image Updater
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false # Next.js stand-alone runner writes build-manifests/cache. Keep writeable by non-root user.
+            capabilities:
+              drop:
+                - ALL
+
+          # Resource allocation
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+          # Health Probes
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 2
+
+          # ConfigMap and Secrets Injection
+          envFrom:
+            - configMapRef:
+                name: gocart-config
+            - secretRef:
+                name: gocart-secrets
