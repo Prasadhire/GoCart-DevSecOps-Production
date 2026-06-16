@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - prasadhire/gocart:09194811b2b18cc6199f6b4aa0936c6721fc9047
