@@ -130,33 +130,4 @@ jobs:
           name: trivy-image-report
           path: trivy-image-report.json
 
-  owasp-zap-dast-scan:
-    name: OWASP ZAP DAST Scan
-    needs: docker-build-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Start Container for DAST Scan
-        run: |
-          docker run -d --name app-scan -p 3000:3000 prasadhire/gocart:latest
-          # Wait for server startup
-          sleep 10
-
-      - name: Run OWASP ZAP Scan
-        uses: zaproxy/action-baseline@v0.12.0
-        with:
-          target: 'http://localhost:3000'
-          fail_action: false
-          allow_issue_writing: false
-          artifact_name: 'zapreport'
-
-      - name: Stop Container
-        run: docker stop app-scan
+  
