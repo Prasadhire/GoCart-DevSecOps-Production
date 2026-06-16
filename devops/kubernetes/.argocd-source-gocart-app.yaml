@@ -1,3 +1,3 @@
 kustomize:
   images:
-  - prasadhire/gocart:73bb25dd6dab89d3cf5d6a9a56c63c234146fb2b
+  - prasadhire/gocart:2d76e2a6604c667574829977e78679c31cb862c5
