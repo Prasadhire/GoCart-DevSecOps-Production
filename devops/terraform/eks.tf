@@ -15,7 +15,7 @@ module "eks" {
   eks_managed_node_groups = {
     gocart_nodes = {
       name           = "gocart-node-group"
-      instance_types = ["t3.medium"]
+      instance_types = ["c7i-flex.large"]
 
       min_size     = 2
       max_size     = 5
