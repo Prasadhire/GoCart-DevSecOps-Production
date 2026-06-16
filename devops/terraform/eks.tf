@@ -41,6 +41,9 @@ module "eks" {
   # Enable IAM Roles for Service Accounts (IRSA) via OIDC
   enable_irsa = true
 
+  #Grant cluster admin permissions to the IAM identity creating the cluster (terra-admin)
+  enable_cluster_creator_admin_permissions = true
+
   tags = {
     Environment = var.environment
     Project     = "gocart"
