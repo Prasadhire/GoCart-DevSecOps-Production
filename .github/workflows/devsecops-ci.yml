@@ -155,6 +155,7 @@ jobs:
         with:
           target: 'http://localhost:3000'
           fail_action: false
+          allow_issue_writing: false
 
       - name: Stop Container
         run: docker stop app-scan
