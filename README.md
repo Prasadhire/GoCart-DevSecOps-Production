@@ -4,10 +4,37 @@
 
 GoCart is a modern Next.js e-commerce platform orchestrated for enterprise-level scale, running inside a zero-trust **AWS EKS Kubernetes** cluster and continuous delivery managed via **ArgoCD GitOps** controllers.
 
-Designed and Architected by **Prasad Hire**
+## 👤 Author & Infrastructure Lead
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/prasad-hire-4a818b337)
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Prasadhire)
+<table>
+  <tr>
+    <td align="center" width="200px">
+      <a href="https://github.com/Prasadhire">
+        <img src="https://github.com/Prasadhire.png" width="100px" style="border-radius: 50%" alt="Prasad Hire"/>
+        <br />
+        <strong>Prasad Hire</strong>
+      </a>
+      <br />
+      DevOps & Cloud Engineer
+      <br /><br />
+      <a href="https://www.linkedin.com/in/prasad-hire-4a818b337" target="_blank">
+        <img src="https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=flat&logo=linkedin&logoColor=white" alt="LinkedIn"/>
+      </a>
+      <a href="https://github.com/Prasadhire" target="_blank">
+        <img src="https://img.shields.io/badge/GitHub-100000?style=flat&logo=github&logoColor=white" alt="GitHub"/>
+      </a>
+    </td>
+    <td>
+      <h3>Hi there, I'm Prasad Hire! 👋</h3>
+      <p>I am a Cloud Engineer & DevSecOps specialist focusing on building highly secure, automated, and self-healing infrastructure. This blueprint models production-grade container security, continuous integration safeguards, and GitOps lifecycle management on AWS.</p>
+      <ul>
+        <li>🛡️ <b>DevSecOps & SAST</b>: Hardened multi-stage container isolation with automated SonarCloud, Trivy, and OWASP scanning.</li>
+        <li>🔄 <b>GitOps Automation</b>: Declarative App-of-Apps continuous deployment and auto-commit image updater triggers.</li>
+        <li>☁️ <b>Cloud Native & IaC</b>: Automated Multi-AZ AWS EKS & RDS PostgreSQL topologies managed via Terraform.</li>
+      </ul>
+    </td>
+  </tr>
+</table>
 
 ---
 
