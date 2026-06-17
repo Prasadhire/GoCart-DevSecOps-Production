@@ -14,7 +14,7 @@ spec:
     helm:
       values: |
         grafana:
-          adminPassword: "admin_secure_pass_2026"
+          adminPassword: "YOUR_SECURE_GRAFANA_PASSWORD"
           ingress:
             enabled: false
         prometheus:
