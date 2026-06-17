@@ -4,7 +4,7 @@
 
 GoCart is a modern Next.js e-commerce platform orchestrated for enterprise-level scale, running inside a zero-trust **AWS EKS Kubernetes** cluster and continuous delivery managed via **ArgoCD GitOps** controllers.
 
-## 👤 Author & Infrastructure Lead
+## 👤 Author
 
 <blockquote>
   <h2><b>PRASAD HIRE</b></h2>
